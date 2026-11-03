@@ -68,17 +68,15 @@
     localStorage.setItem('usageCountToday', String(next));
     window.checkAccess();
   };
-  window.payWithPaystack = function () {
+  window.payWithPaystack = async function () {
     const emailField = document.getElementById('access-email');
     const paymentEmailField = document.getElementById('payment-email');
     const email = (paymentEmailField ? paymentEmailField.value.trim() : '') || (emailField ? emailField.value.trim() : '') || localStorage.getItem('verifiedEmail') || '';
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { window.alert('Please enter a valid email address.'); return; }
-    if (!window.PaystackPop) {
-      const paymentMessage = document.getElementById('payment-message');
-      if (paymentMessage) paymentMessage.textContent = 'Payment service is still loading. Please wait a moment and try again.';
-      return;
-    }
-    window.PaystackPop.setup({
+    const paymentMessage = document.getElementById('payment-message');
+    try {
+      const PaystackPop = window.PaystackPop || await window.paystackReady;
+      PaystackPop.setup({
       key: 'pk_live_1b5fcde560c6d3a00ee2fe9feb4c53632583ffc0',
       email: email,
       amount: 350000,
@@ -100,8 +98,11 @@
           if (paymentMessage) paymentMessage.textContent = error.message || 'Payment activation failed.';
         }
       },
-      onClose: function () {}
-    }).openIframe();
+        onClose: function () {}
+      }).openIframe();
+    } catch (error) {
+      if (paymentMessage) paymentMessage.textContent = error.message || 'Payment service is unavailable.';
+    }
   };
   function init() {
     resetDailyUsage();
