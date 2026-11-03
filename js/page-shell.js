@@ -1,9 +1,5 @@
 (function () {
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('../service-worker.js');
-  if (window.location.protocol !== 'file:' && sessionStorage.getItem('naijaToolsStarted') !== 'true') {
-    window.location.replace('../index.html');
-    return;
-  }
   const modal = document.createElement('div');
   modal.id = 'pay-modal';
   modal.className = 'pay-modal';
