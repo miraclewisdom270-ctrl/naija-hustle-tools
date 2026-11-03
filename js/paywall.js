@@ -107,10 +107,24 @@
     resetDailyUsage();
     document.querySelectorAll('[data-close-paywall]').forEach((button) => button.addEventListener('click', () => { if (modal) modal.hidden = true; }));
     const sendCode = document.getElementById('send-code');
+    const newAccount = document.getElementById('new-account');
+    const backToLogin = document.getElementById('back-to-login');
     const loginAccount = document.getElementById('login-account');
     const verifyCode = document.getElementById('verify-code');
     const message = document.getElementById('access-message');
     if (sendCode) sendCode.onclick = requestVerificationCode;
+    if (newAccount) newAccount.onclick = () => {
+      document.getElementById('login-fields').hidden = true;
+      document.getElementById('signup-fields').hidden = false;
+      document.getElementById('access-title').textContent = 'Create your account.';
+      document.getElementById('access-description').textContent = 'We will email one code, then you create a password for future sign-ins.';
+    };
+    if (backToLogin) backToLogin.onclick = () => {
+      document.getElementById('login-fields').hidden = false;
+      document.getElementById('signup-fields').hidden = true;
+      document.getElementById('access-title').textContent = 'Sign in to continue.';
+      document.getElementById('access-description').textContent = 'Use your email and password. New users can verify their email once and create a password.';
+    };
     if (loginAccount) loginAccount.addEventListener('click', async () => {
       const email = document.getElementById('access-email').value.trim();
       const password = document.getElementById('access-password').value;
