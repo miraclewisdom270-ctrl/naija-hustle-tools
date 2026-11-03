@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin — NaijaTools</title><link rel="stylesheet" href="css/style.css">
+</head>
+<body class="admin-page">
+  <main class="admin-shell">
+    <a class="brand" href="index.html"><span class="brand-mark">N</span> Naija<span>Tools</span></a>
+    <section id="login-panel" class="admin-panel">
+      <p class="eyebrow">Private access</p><h1>Admin login</h1>
+      <form id="admin-login"><label for="admin-password">Password</label><input id="admin-password" type="password" autocomplete="current-password" required><button class="button button-dark" type="submit">Sign in</button><p id="admin-message" role="alert"></p></form>
+    </section>
+    <section id="admin-panel" class="admin-panel" hidden>
+      <div class="admin-heading"><div><p class="eyebrow">NaijaTools control room</p><h1>Overview</h1></div><button id="admin-logout" class="button button-light" type="button">Sign out</button></div>
+      <div class="admin-stats"><article><span>Verified users</span><strong id="stat-users">—</strong></article><article><span>Premium users</span><strong id="stat-premium">—</strong></article><article><span>Downloads today</span><strong id="stat-downloads">—</strong></article></div>
+      <div class="admin-section"><h2>Maintenance notice</h2><p>Save a private site notice for future public announcements.</p><textarea id="site-notice" maxlength="500" placeholder="Optional maintenance message"></textarea><button id="save-notice" class="button button-dark" type="button">Save notice</button><p id="notice-message" role="alert"></p></div>
+    </section>
+  </main>
+  <script src="js/admin.js"></script>
+</body>
+</html>
