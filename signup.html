@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign up — NaijaTools</title><link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+  <main class="auth-shell">
+    <a class="brand" href="index.html"><span class="brand-mark">N</span> Naija<span>Tools</span></a>
+    <section class="auth-panel">
+      <div id="auth-login">
+        <p class="eyebrow">Welcome back</p><h1>Sign in.</h1>
+        <label for="auth-login-email">Email address</label><input id="auth-login-email" type="email" autocomplete="email" required>
+        <label for="auth-login-password">Password</label><input id="auth-login-password" type="password" autocomplete="current-password" required>
+        <button id="auth-login-button" class="button button-dark" type="button">Sign in</button>
+        <button id="show-signup" class="button button-light" type="button">Create a new account</button>
+      </div>
+      <div id="auth-signup" hidden>
+        <p class="eyebrow">New account</p><h1>Start building.</h1>
+        <label for="auth-signup-email">Email address</label><input id="auth-signup-email" type="email" autocomplete="email" required>
+        <button id="auth-send-code" class="button button-dark" type="button">Send verification code</button>
+        <div id="auth-code-step" hidden>
+          <label for="auth-code">Verification code</label><input id="auth-code" inputmode="numeric" autocomplete="one-time-code">
+          <label for="auth-password">Create password</label><input id="auth-password" type="password" autocomplete="new-password">
+          <label for="auth-password-confirm">Confirm password</label><input id="auth-password-confirm" type="password" autocomplete="new-password">
+          <button id="auth-create-button" class="button button-dark" type="button">Verify and create account</button>
+        </div>
+        <button id="show-login" class="button button-light" type="button">Back to sign in</button>
+      </div>
+      <p id="auth-message" class="access-message" role="alert"></p>
+    </section>
+  </main>
+  <script src="js/auth.js"></script>
+</body>
+</html>
