@@ -54,7 +54,7 @@
     if (!email || !email.includes('@')) { window.alert('Please enter a valid email address.'); return; }
     if (!window.PaystackPop) { window.alert('Payment service is not loaded. Please try again.'); return; }
     window.PaystackPop.setup({
-      key: 'pk_test_0a500dbf6f1041c4f7f24a40213bb0b3fc737444',
+      key: 'pk_live_1b5fcde560c6d3a00ee2fe9feb4c53632583ffc0',
       email: email,
       amount: 350000,
       currency: 'NGN',

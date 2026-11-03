@@ -22,8 +22,16 @@ async function sendCode(email, code) {
   if (!process.env.RESEND_API_KEY || !process.env.FROM_EMAIL) throw new Error('Email service is not configured');
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
-    headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from: process.env.FROM_EMAIL, to: [email], subject: 'Your NaijaTools verification code', html: `<p>Your NaijaTools verification code is:</p><p style="font-size:28px;font-weight:bold;letter-spacing:5px">${code}</p><p>This code expires in 10 minutes.</p>` })
+    headers: {
+      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      from: process.env.FROM_EMAIL,
+      to: [email],
+      subject: 'Your NaijaTools verification code',
+      html: `<p>Your NaijaTools verification code is:</p><p style="font-size:28px;font-weight:bold;letter-spacing:5px">${code}</p><p>This code expires in 10 minutes.</p>`
+    })
   });
   if (!response.ok) throw new Error('Email provider rejected the request');
 }
