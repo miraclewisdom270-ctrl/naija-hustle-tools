@@ -1,4 +1,4 @@
-const CACHE_NAME = 'naijatools-v1';
+const CACHE_NAME = 'naijatools-v2';
 const APP_SHELL = [
   '/',
   '/index.html',

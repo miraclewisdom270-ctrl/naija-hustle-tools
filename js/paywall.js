@@ -14,7 +14,7 @@
     localStorage.setItem('isPremium', 'false');
     return false;
   }
-  const api = (action, data = {}) => fetch('/.netlify/functions/usage', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, ...data }) }).then((response) => response.json());
+  const api = (action, data = {}) => fetch('/api/usage', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, ...data }) }).then((response) => response.json());
   window.checkAccess = async function () {
     resetDailyUsage();
     let remote;
