@@ -51,7 +51,8 @@
   };
   window.payWithPaystack = function () {
     const emailField = document.getElementById('access-email');
-    const email = (emailField ? emailField.value.trim() : '') || localStorage.getItem('verifiedEmail') || '';
+    const paymentEmailField = document.getElementById('payment-email');
+    const email = (paymentEmailField ? paymentEmailField.value.trim() : '') || (emailField ? emailField.value.trim() : '') || localStorage.getItem('verifiedEmail') || '';
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { window.alert('Please enter a valid email address.'); return; }
     if (!window.PaystackPop) { window.alert('Payment service is not loaded. Please try again.'); return; }
     window.PaystackPop.setup({
@@ -94,6 +95,9 @@
     const savedEmail = localStorage.getItem('verifiedEmail');
     const emailField = document.getElementById('access-email');
     if (emailField && savedEmail) emailField.value = savedEmail;
+    const paymentEmailField = document.getElementById('payment-email');
+    if (paymentEmailField && savedEmail) paymentEmailField.value = savedEmail;
+    if (emailField && paymentEmailField) emailField.addEventListener('input', () => { paymentEmailField.value = emailField.value; });
     window.checkAccess();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
