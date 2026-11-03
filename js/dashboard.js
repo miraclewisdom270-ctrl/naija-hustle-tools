@@ -1,6 +1,6 @@
 (function () {
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/service-worker.js');
-  if (sessionStorage.getItem('naijaToolsStarted') !== 'true') {
+  if (window.location.protocol !== 'file:' && sessionStorage.getItem('naijaToolsStarted') !== 'true') {
     window.location.replace('index.html');
     return;
   }
