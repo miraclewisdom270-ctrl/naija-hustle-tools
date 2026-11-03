@@ -52,6 +52,12 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST required' });
   const input = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
   try {
+    if (input.action === 'logout') {
+      const token = cookieValue(req.headers.cookie || '', 'nt_session');
+      if (token) await deleteKey(`session:${token}`);
+      res.setHeader('Set-Cookie', 'nt_session=; HttpOnly; Secure; SameSite=Lax; Max-Age=0; Path=/');
+      return res.status(200).json({ ok: true });
+    }
     if (input.action === 'request') {
       const email = String(input.email || '').trim().toLowerCase();
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'Enter a valid email address' });

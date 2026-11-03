@@ -5,4 +5,13 @@
       sessionStorage.setItem('naijaToolsStarted', 'true');
     });
   });
+  const signout = document.getElementById('customer-signout');
+  if (signout) signout.addEventListener('click', async function () {
+    await fetch('/api/usage', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'logout' }) });
+    sessionStorage.clear();
+    localStorage.removeItem('verifiedEmail');
+    localStorage.removeItem('isPremium');
+    localStorage.removeItem('premiumExpiryDate');
+    window.location.href = 'index.html';
+  });
 })();
