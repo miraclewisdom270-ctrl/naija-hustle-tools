@@ -82,9 +82,8 @@
       amount: 350000,
       currency: 'NGN',
       ref: 'NAIJA-' + Math.floor(Math.random() * 1000000000),
-      callback: async function (response) {
-        try {
-          const activation = await api('activate', { reference: response.reference });
+      callback: function (response) {
+        api('activate', { reference: response.reference }).then((activation) => {
           if (!activation.ok) throw new Error(activation.error || 'Access activation failed');
           localStorage.setItem('isPremium', 'true');
           const expiry = new Date();
@@ -93,10 +92,9 @@
           window.alert('Payment Successful! You now have unlimited access for 30 days');
           if (modal) modal.hidden = true;
           window.location.reload();
-        } catch (error) {
-          const paymentMessage = document.getElementById('payment-message');
+        }).catch((error) => {
           if (paymentMessage) paymentMessage.textContent = error.message || 'Payment activation failed.';
-        }
+        });
       },
         onClose: function () {}
       }).openIframe();
