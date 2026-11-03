@@ -15,6 +15,25 @@
     return false;
   }
   const api = (action, data = {}) => fetch('/api/usage', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, ...data }) }).then((response) => response.json());
+  async function requestVerificationCode() {
+    const email = document.getElementById('access-email').value.trim();
+    const button = document.getElementById('send-code');
+    const message = document.getElementById('access-message');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { message.textContent = 'Enter a valid email address first.'; return; }
+    button.disabled = true;
+    message.textContent = 'Sending verification code…';
+    try {
+      const result = await api('request', { email });
+      if (!result.ok) throw new Error(result.error || 'Unable to send verification code');
+      document.getElementById('code-step').hidden = false;
+      message.textContent = 'Code sent. Check your email.';
+    } catch (error) {
+      message.textContent = error.message || 'Unable to send verification code';
+    } finally {
+      button.disabled = false;
+    }
+  }
+  window.requestVerificationCode = requestVerificationCode;
   window.checkAccess = async function () {
     resetDailyUsage();
     let remote;
@@ -91,11 +110,7 @@
     const loginAccount = document.getElementById('login-account');
     const verifyCode = document.getElementById('verify-code');
     const message = document.getElementById('access-message');
-    if (sendCode) sendCode.addEventListener('click', async () => {
-      const email = document.getElementById('access-email').value.trim();
-      sendCode.disabled = true;
-      try { const result = await api('request', { email }); if (!result.ok) throw new Error(result.error); document.getElementById('code-step').hidden = false; message.textContent = 'Code sent. Check your email.'; } catch (error) { message.textContent = error.message; } finally { sendCode.disabled = false; }
-    });
+    if (sendCode) sendCode.onclick = requestVerificationCode;
     if (loginAccount) loginAccount.addEventListener('click', async () => {
       const email = document.getElementById('access-email').value.trim();
       const password = document.getElementById('access-password').value;
