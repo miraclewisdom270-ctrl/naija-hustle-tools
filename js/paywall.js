@@ -54,7 +54,11 @@
     const paymentEmailField = document.getElementById('payment-email');
     const email = (paymentEmailField ? paymentEmailField.value.trim() : '') || (emailField ? emailField.value.trim() : '') || localStorage.getItem('verifiedEmail') || '';
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { window.alert('Please enter a valid email address.'); return; }
-    if (!window.PaystackPop) { window.alert('Payment service is not loaded. Please try again.'); return; }
+    if (!window.PaystackPop) {
+      const paymentMessage = document.getElementById('payment-message');
+      if (paymentMessage) paymentMessage.textContent = 'Payment service is still loading. Please wait a moment and try again.';
+      return;
+    }
     window.PaystackPop.setup({
       key: 'pk_live_1b5fcde560c6d3a00ee2fe9feb4c53632583ffc0',
       email: email,
@@ -62,17 +66,22 @@
       currency: 'NGN',
       ref: 'NAIJA-' + Math.floor(Math.random() * 1000000000),
       callback: async function (response) {
-        const activation = await api('activate', { reference: response.reference });
-        if (!activation.ok) { window.alert('Payment received, but access activation failed. Please contact support.'); return; }
-        localStorage.setItem('isPremium', 'true');
-        const expiry = new Date();
-        expiry.setDate(expiry.getDate() + 30);
-        localStorage.setItem('premiumExpiryDate', expiry.toISOString());
-        window.alert('Payment Successful! You now have unlimited access for 30 days');
-        if (modal) modal.hidden = true;
-        window.location.reload();
+        try {
+          const activation = await api('activate', { reference: response.reference });
+          if (!activation.ok) throw new Error(activation.error || 'Access activation failed');
+          localStorage.setItem('isPremium', 'true');
+          const expiry = new Date();
+          expiry.setDate(expiry.getDate() + 30);
+          localStorage.setItem('premiumExpiryDate', expiry.toISOString());
+          window.alert('Payment Successful! You now have unlimited access for 30 days');
+          if (modal) modal.hidden = true;
+          window.location.reload();
+        } catch (error) {
+          const paymentMessage = document.getElementById('payment-message');
+          if (paymentMessage) paymentMessage.textContent = error.message || 'Payment activation failed.';
+        }
       },
-      onClose: function () { window.alert('Payment cancelled'); }
+      onClose: function () {}
     }).openIframe();
   };
   function init() {
