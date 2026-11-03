@@ -12,6 +12,10 @@ const emailFromSession = async (event, store) => {
   return session.email;
 };
 const today = () => new Date().toISOString().slice(0, 10);
+const getUsageStore = () => {
+  if (!process.env.NETLIFY_SITE_ID || !process.env.NETLIFY_AUTH_TOKEN) throw new Error('Netlify Blobs is not configured. Add NETLIFY_SITE_ID and NETLIFY_AUTH_TOKEN in Netlify.');
+  return getStore({ name: 'naija-usage', consistency: 'strong', siteID: process.env.NETLIFY_SITE_ID, token: process.env.NETLIFY_AUTH_TOKEN });
+};
 
 async function sendCode(email, code) {
   if (!process.env.RESEND_API_KEY || !process.env.FROM_EMAIL) throw new Error('Email service is not configured');
@@ -25,7 +29,7 @@ async function sendCode(email, code) {
 
 export async function handler(event) {
   if (event.httpMethod !== 'POST') return json({ error: 'POST required' }, 405);
-  const store = getStore({ name: 'naija-usage', consistency: 'strong' });
+  const store = getUsageStore();
   let input;
   try { input = JSON.parse(event.body || '{}'); } catch { return json({ error: 'Invalid request' }, 400); }
   try {

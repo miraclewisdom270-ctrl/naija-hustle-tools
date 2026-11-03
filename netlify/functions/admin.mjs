@@ -8,6 +8,10 @@ const json = (body, status = 200, headers = {}) => ({
 });
 const cookieValue = (cookie, name) => cookie?.split(';').map((part) => part.trim()).find((part) => part.startsWith(name + '='))?.slice(name.length + 1);
 const tokenKey = (token) => `admin-session:${token}`;
+const getUsageStore = () => {
+  if (!process.env.NETLIFY_SITE_ID || !process.env.NETLIFY_AUTH_TOKEN) throw new Error('Netlify Blobs is not configured. Add NETLIFY_SITE_ID and NETLIFY_AUTH_TOKEN in Netlify.');
+  return getStore({ name: 'naija-usage', consistency: 'strong', siteID: process.env.NETLIFY_SITE_ID, token: process.env.NETLIFY_AUTH_TOKEN });
+};
 
 async function adminSession(event, store) {
   const token = cookieValue(event.headers.cookie || event.headers.Cookie, 'nt_admin');
@@ -35,7 +39,7 @@ async function getStats(store) {
 
 export async function handler(event) {
   if (event.httpMethod !== 'POST') return json({ error: 'POST required' }, 405);
-  const store = getStore({ name: 'naija-usage', consistency: 'strong' });
+  const store = getUsageStore();
   let input;
   try { input = JSON.parse(event.body || '{}'); } catch { return json({ error: 'Invalid request' }, 400); }
   try {
