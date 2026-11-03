@@ -23,6 +23,7 @@
       if (modal) modal.hidden = false;
       return false;
     }
+    if (remote.email) localStorage.setItem('verifiedEmail', remote.email);
     const active = remote?.premium === true || premiumIsActive();
     const count = remote?.usageCount ?? Number(localStorage.getItem('usageCountToday') || 0);
     document.querySelectorAll('[data-premium-badge]').forEach((badge) => {
@@ -50,8 +51,8 @@
   };
   window.payWithPaystack = function () {
     const emailField = document.getElementById('access-email');
-    const email = emailField ? emailField.value.trim() : '';
-    if (!email || !email.includes('@')) { window.alert('Please enter a valid email address.'); return; }
+    const email = (emailField ? emailField.value.trim() : '') || localStorage.getItem('verifiedEmail') || '';
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { window.alert('Please enter a valid email address.'); return; }
     if (!window.PaystackPop) { window.alert('Payment service is not loaded. Please try again.'); return; }
     window.PaystackPop.setup({
       key: 'pk_live_1b5fcde560c6d3a00ee2fe9feb4c53632583ffc0',
@@ -86,10 +87,13 @@
     });
     if (verifyCode) verifyCode.addEventListener('click', async () => {
       const email = document.getElementById('access-email').value.trim();
-      try { const result = await api('verify', { email, code: document.getElementById('access-code').value }); if (!result.ok) throw new Error(result.error); modal.hidden = true; window.location.reload(); } catch (error) { message.textContent = error.message; }
+      try { const result = await api('verify', { email, code: document.getElementById('access-code').value }); if (!result.ok) throw new Error(result.error); localStorage.setItem('verifiedEmail', email); modal.hidden = true; window.location.reload(); } catch (error) { message.textContent = error.message; }
     });
     const payButton = document.getElementById('pay-btn');
     if (payButton) payButton.addEventListener('click', window.payWithPaystack);
+    const savedEmail = localStorage.getItem('verifiedEmail');
+    const emailField = document.getElementById('access-email');
+    if (emailField && savedEmail) emailField.value = savedEmail;
     window.checkAccess();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
