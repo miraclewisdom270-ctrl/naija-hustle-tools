@@ -1,0 +1,13 @@
+{
+  "name": "Naija Hustle Tools",
+  "short_name": "NaijaTools",
+  "description": "Professional business tools for Nigerian hustlers.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f6f1",
+  "theme_color": "#101412",
+  "icons": [
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
