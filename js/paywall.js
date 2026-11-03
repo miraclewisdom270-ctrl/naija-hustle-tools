@@ -88,6 +88,7 @@
     resetDailyUsage();
     document.querySelectorAll('[data-close-paywall]').forEach((button) => button.addEventListener('click', () => { if (modal) modal.hidden = true; }));
     const sendCode = document.getElementById('send-code');
+    const loginAccount = document.getElementById('login-account');
     const verifyCode = document.getElementById('verify-code');
     const message = document.getElementById('access-message');
     if (sendCode) sendCode.addEventListener('click', async () => {
@@ -95,9 +96,15 @@
       sendCode.disabled = true;
       try { const result = await api('request', { email }); if (!result.ok) throw new Error(result.error); document.getElementById('code-step').hidden = false; message.textContent = 'Code sent. Check your email.'; } catch (error) { message.textContent = error.message; } finally { sendCode.disabled = false; }
     });
+    if (loginAccount) loginAccount.addEventListener('click', async () => {
+      const email = document.getElementById('access-email').value.trim();
+      const password = document.getElementById('access-password').value;
+      loginAccount.disabled = true;
+      try { const result = await api('login', { email, password }); if (!result.ok) throw new Error(result.error); localStorage.setItem('verifiedEmail', email); modal.hidden = true; window.location.reload(); } catch (error) { message.textContent = error.message; } finally { loginAccount.disabled = false; }
+    });
     if (verifyCode) verifyCode.addEventListener('click', async () => {
       const email = document.getElementById('access-email').value.trim();
-      try { const result = await api('verify', { email, code: document.getElementById('access-code').value }); if (!result.ok) throw new Error(result.error); localStorage.setItem('verifiedEmail', email); modal.hidden = true; window.location.reload(); } catch (error) { message.textContent = error.message; }
+      try { const result = await api('verify', { email, code: document.getElementById('access-code').value, password: document.getElementById('new-password').value }); if (!result.ok) throw new Error(result.error); localStorage.setItem('verifiedEmail', email); modal.hidden = true; window.location.reload(); } catch (error) { message.textContent = error.message; }
     });
     const payButton = document.getElementById('pay-btn');
     if (payButton) payButton.addEventListener('click', window.payWithPaystack);

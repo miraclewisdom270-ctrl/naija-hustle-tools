@@ -4,6 +4,18 @@ import { deleteKey, getJson, setJson } from './_storage.mjs';
 const emailKey = (email) => crypto.createHash('sha256').update(email.toLowerCase()).digest('hex');
 const cookieValue = (cookie, name) => cookie?.split(';').map((part) => part.trim()).find((part) => part.startsWith(`${name}=`))?.slice(name.length + 1);
 const today = () => new Date().toISOString().slice(0, 10);
+const passwordHash = (password, salt = crypto.randomBytes(16).toString('hex')) => `${salt}:${crypto.scryptSync(password, salt, 64).toString('hex')}`;
+const passwordMatches = (password, stored) => {
+  const [salt, hash] = String(stored || '').split(':');
+  if (!salt || !hash) return false;
+  const actual = crypto.scryptSync(password, salt, 64);
+  return crypto.timingSafeEqual(actual, Buffer.from(hash, 'hex'));
+};
+const createSession = async (email, res) => {
+  const token = crypto.randomBytes(32).toString('hex');
+  await setJson(`session:${token}`, { email, expiresAt: Date.now() + 2592000000 });
+  res.setHeader('Set-Cookie', `nt_session=${token}; HttpOnly; Secure; SameSite=Lax; Max-Age=2592000; Path=/`);
+};
 const sessionEmail = async (event) => {
   const token = cookieValue(event.headers.cookie || event.headers.Cookie, 'nt_session');
   if (!token) return null;
@@ -52,10 +64,20 @@ export default async function handler(req, res) {
       const email = String(input.email || '').trim().toLowerCase();
       const record = await getJson(`code:${emailKey(email)}`);
       if (!record || record.expiresAt < Date.now() || record.code !== String(input.code || '').trim()) return res.status(400).json({ error: 'That verification code is invalid or expired' });
-      const token = crypto.randomBytes(32).toString('hex');
-      await setJson(`session:${token}`, { email, expiresAt: Date.now() + 2592000000 });
+      if (typeof input.password !== 'string' || input.password.length < 8) return res.status(400).json({ error: 'Create a password with at least 8 characters' });
+      const userKey = `user:${emailKey(email)}`;
+      const user = (await getJson(userKey)) || { email, usageDate: today(), usageCount: 0, premiumExpiry: null };
+      user.passwordHash = passwordHash(input.password);
+      await setJson(userKey, user);
       await deleteKey(`code:${emailKey(email)}`);
-      res.setHeader('Set-Cookie', `nt_session=${token}; HttpOnly; Secure; SameSite=Lax; Max-Age=2592000; Path=/`);
+      await createSession(email, res);
+      return res.status(200).json({ ok: true });
+    }
+    if (input.action === 'login') {
+      const email = String(input.email || '').trim().toLowerCase();
+      const user = await getJson(`user:${emailKey(email)}`);
+      if (!user?.passwordHash || typeof input.password !== 'string' || !passwordMatches(input.password, user.passwordHash)) return res.status(401).json({ error: 'Email or password is incorrect' });
+      await createSession(email, res);
       return res.status(200).json({ ok: true });
     }
     const email = await sessionEmail({ headers: req.headers });
