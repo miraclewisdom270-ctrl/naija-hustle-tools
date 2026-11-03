@@ -1,11 +1,10 @@
 import { getStore } from '@netlify/blobs';
 import crypto from 'node:crypto';
 
-const store = getStore({ name: 'naija-usage', consistency: 'strong' });
 const json = (body, status = 200, headers = {}) => ({ statusCode: status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', ...headers }, body: JSON.stringify(body) });
 const emailKey = (email) => crypto.createHash('sha256').update(email.toLowerCase()).digest('hex');
 const cookieValue = (cookie, name) => cookie?.split(';').map((part) => part.trim()).find((part) => part.startsWith(name + '='))?.slice(name.length + 1);
-const emailFromSession = async (event) => {
+const emailFromSession = async (event, store) => {
   const token = cookieValue(event.headers.cookie || event.headers.Cookie, 'nt_session');
   if (!token) return null;
   const session = await store.get(`session:${token}`, { type: 'json' });
@@ -26,6 +25,7 @@ async function sendCode(email, code) {
 
 export async function handler(event) {
   if (event.httpMethod !== 'POST') return json({ error: 'POST required' }, 405);
+  const store = getStore({ name: 'naija-usage', consistency: 'strong' });
   let input;
   try { input = JSON.parse(event.body || '{}'); } catch { return json({ error: 'Invalid request' }, 400); }
   try {
@@ -46,7 +46,7 @@ export async function handler(event) {
       await store.delete(`code:${emailKey(email)}`);
       return json({ ok: true }, 200, { 'Set-Cookie': `nt_session=${token}; HttpOnly; Secure; SameSite=Lax; Max-Age=2592000; Path=/` });
     }
-    const email = await emailFromSession(event);
+    const email = await emailFromSession(event, store);
     if (!email) return json({ error: 'Verify your email first' }, 401);
     const userKey = `user:${emailKey(email)}`;
     const user = (await store.get(userKey, { type: 'json' })) || { email, usageDate: today(), usageCount: 0, premiumExpiry: null };

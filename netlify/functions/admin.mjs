@@ -1,7 +1,6 @@
 import { getStore } from '@netlify/blobs';
 import crypto from 'node:crypto';
 
-const store = getStore({ name: 'naija-usage', consistency: 'strong' });
 const json = (body, status = 200, headers = {}) => ({
   statusCode: status,
   headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', ...headers },
@@ -10,7 +9,7 @@ const json = (body, status = 200, headers = {}) => ({
 const cookieValue = (cookie, name) => cookie?.split(';').map((part) => part.trim()).find((part) => part.startsWith(name + '='))?.slice(name.length + 1);
 const tokenKey = (token) => `admin-session:${token}`;
 
-async function adminSession(event) {
+async function adminSession(event, store) {
   const token = cookieValue(event.headers.cookie || event.headers.Cookie, 'nt_admin');
   if (!token) return null;
   const session = await store.get(tokenKey(token), { type: 'json' });
@@ -18,7 +17,7 @@ async function adminSession(event) {
   return session;
 }
 
-async function getStats() {
+async function getStats(store) {
   const listed = await store.list({ prefix: 'user:' });
   const users = listed.blobs || [];
   let premiumUsers = 0;
@@ -36,6 +35,7 @@ async function getStats() {
 
 export async function handler(event) {
   if (event.httpMethod !== 'POST') return json({ error: 'POST required' }, 405);
+  const store = getStore({ name: 'naija-usage', consistency: 'strong' });
   let input;
   try { input = JSON.parse(event.body || '{}'); } catch { return json({ error: 'Invalid request' }, 400); }
   try {
