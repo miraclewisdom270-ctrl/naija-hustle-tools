@@ -1,4 +1,4 @@
-const CACHE_NAME = 'naijatools-v3';
+const CACHE_NAME = 'naijatools-v4';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -8,7 +8,8 @@ const APP_SHELL = [
   '/js/dashboard.js',
   '/js/page-shell.js',
   '/js/paywall.js',
-  '/js/tools.js'
+  '/js/tools.js',
+  '/js/extended-tools.js'
 ];
 
 self.addEventListener('install', (event) => {

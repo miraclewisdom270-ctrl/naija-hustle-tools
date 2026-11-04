@@ -1,6 +1,6 @@
 (function () {
   document.body.style.visibility = 'hidden';
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('../service-worker.js?v=3');
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('../service-worker.js?v=4');
   fetch('/api/usage', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'status' }) })
     .then(function (response) { return response.json(); })
     .then(function (result) {
