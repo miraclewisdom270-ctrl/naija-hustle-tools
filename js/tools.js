@@ -1,7 +1,7 @@
 (function () {
   const tool = document.body.dataset.tool;
   const key = 'naijatools-data-' + tool;
-  const state = Object.assign({ business: '', client: '', contact: '', title: '', body: '', note: '', items: [{ description: 'Service or product', qty: 1, price: 0 }] }, JSON.parse(localStorage.getItem(key) || 'null'));
+  const state = Object.assign({ business: '', client: '', contact: '', title: '', summary: '', body: '', education: '', note: '', items: [{ description: 'Service or product', qty: 1, price: 0 }] }, JSON.parse(localStorage.getItem(key) || 'null'));
   const $ = (id) => document.getElementById(id);
   const money = (n) => '₦' + Number(n || 0).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const esc = (value) => String(value || '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[c]));
@@ -13,7 +13,15 @@
   function docHeader(label) { return `<div class="doc-top"><div><div class="doc-brand">${esc(state.business) || 'Your Business'}<span>.</span></div><div style="font-size:11px;color:#69706a;margin-top:5px">${esc(state.contact)}</div></div><div class="doc-meta"><strong>${label}</strong><span>NT-${String(Date.now()).slice(-6)}</span><br><span>${new Date().toLocaleDateString('en-NG')}</span></div></div>`; }
   function render() {
     const preview = $('tool-preview');
-    if (tool === 'cv') { preview.innerHTML = `<div style="border-bottom:3px solid #101412;padding-bottom:24px"><div style="font:700 35px/.95 'Space Grotesk',sans-serif">${esc(state.business) || 'Your Name'}</div><div style="font:600 15px 'Space Grotesk',sans-serif;color:#14b866;margin-top:10px">${esc(state.title) || 'Professional title'}</div><div style="font:10px 'DM Mono',monospace;color:#69706a;margin-top:12px">${esc(state.contact)}</div></div><div class="doc-section"><span class="doc-label">Profile</span><p>${esc(state.body).replace(/\n/g, '<br>') || 'Your professional profile summary will appear here.'}</p><span class="doc-label">Skills</span><p>${esc(state.note) || 'Your skills will appear here.'}</p></div>`; return; }
+    if (tool === 'cv') {
+      const bullets = (value, fallback) => {
+        const lines = String(value || '').split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+        return lines.length ? `<ul style="margin:8px 0 0;padding-left:18px">${lines.map((line) => `<li style="margin:5px 0">${esc(line.replace(/^[-*•]\s*/, ''))}</li>`).join('')}</ul>` : `<p>${fallback}</p>`;
+      };
+      const section = (label, content) => `<section style="margin-top:24px"><span class="doc-label">${label}</span>${content}</section>`;
+      preview.innerHTML = `<div style="border-bottom:3px solid #101412;padding-bottom:24px"><div style="font:700 35px/.95 'Space Grotesk',sans-serif">${esc(state.business) || 'Your Name'}</div><div style="font:600 15px 'Space Grotesk',sans-serif;color:#14b866;margin-top:10px">${esc(state.title) || 'Professional title'}</div><div style="font:10px 'DM Mono',monospace;color:#69706a;margin-top:12px">${esc(state.contact) || 'Email · phone · location'}</div></div>${section('Professional summary', `<p>${esc(state.summary) || 'Add a concise summary that highlights your experience and strengths.'}</p>`)}${section('Experience', bullets(state.body, 'Add your responsibilities and achievements, one per line.'))}${section('Education', `<p style="white-space:pre-line">${esc(state.education) || 'Add your education and qualifications.'}</p>`)}${section('Skills', `<p>${esc(state.note) || 'Add your strongest skills, separated by commas.'}</p>`)}`;
+      return;
+    }
     if (tool === 'card') { preview.innerHTML = `<div style="background:#101412;color:#fff;min-height:290px;padding:35px;display:flex;flex-direction:column;justify-content:space-between"><div class="doc-brand" style="color:#fff">${esc(state.business) || 'Your Brand'}<span>.</span></div><div><div style="font:700 28px 'Space Grotesk',sans-serif">${esc(state.client) || 'Your Name'}</div><div style="color:#14b866;font:12px 'DM Mono',monospace;margin-top:8px">${esc(state.title) || 'Your role'}</div><div style="font:11px 'DM Mono',monospace;color:#c5ccc7;margin-top:20px">${esc(state.contact)}</div></div></div>`; return; }
     if (tool === 'letter') { preview.innerHTML = `<div>${docHeader('LETTER')}<div style="margin-top:40px;font-size:12px;color:#69706a">${new Date().toLocaleDateString('en-NG')}</div><h2 style="font:700 24px 'Space Grotesk',sans-serif;margin:30px 0 18px">${esc(state.title) || 'Letter subject'}</h2><p style="font-size:13px;line-height:1.75;white-space:pre-line">${esc(state.body) || 'Write your professional letter here.'}</p><div class="doc-footer">${esc(state.note) || 'Kind regards,'}<br><strong>${esc(state.business) || 'Your Name'}</strong></div></div>`; return; }
     const total = state.items.reduce((sum, item) => sum + Number(item.qty || 0) * Number(item.price || 0), 0);
