@@ -34,9 +34,11 @@
     try {
       const result = await api('verify', { email, code: document.getElementById('auth-code').value.trim(), password });
       if (!result.ok) throw new Error(result.error || 'Unable to create account');
+      await api('logout');
       localStorage.setItem('verifiedEmail', email);
-      sessionStorage.setItem('naijaToolsStarted', 'true');
-      window.location.href = 'dashboard.html';
+      document.getElementById('auth-login-email').value = email;
+      show('login');
+      message.textContent = 'Account created. Sign in with your new password.';
     } catch (error) { message.textContent = error.message; }
   });
 })();
