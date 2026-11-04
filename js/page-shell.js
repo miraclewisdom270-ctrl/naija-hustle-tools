@@ -44,7 +44,7 @@
   const toolScripts = document.body.dataset.extended === 'true'
     ? ['../js/extended-tools.js?v=1']
     : ['../js/tools.js?v=4'];
-  ['https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', '../js/paywall.js?v=4'].concat(toolScripts).forEach(function (src) {
+  ['https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', '../js/paywall.js?v=4'].concat(toolScripts).concat(document.body.dataset.ai === 'true' ? ['../js/ai-assist.js?v=1'] : []).forEach(function (src) {
     const script = document.createElement('script');
     script.src = src;
     script.async = false;

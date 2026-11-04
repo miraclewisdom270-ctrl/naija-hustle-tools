@@ -9,7 +9,8 @@ const APP_SHELL = [
   '/js/page-shell.js',
   '/js/paywall.js',
   '/js/tools.js',
-  '/js/extended-tools.js'
+  '/js/extended-tools.js',
+  '/js/ai-assist.js'
 ];
 
 self.addEventListener('install', (event) => {
